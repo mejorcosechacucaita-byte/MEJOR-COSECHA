@@ -618,7 +618,7 @@ function init(){
 // HOME
 // ============================================================
 function renderHome(){
-  document.getElementById("homeScreen").style.display = "";
+  document.getElementById("homeScreen").style.display = "block";
   document.getElementById("cropScreen").style.display = "none";
   document.getElementById("btnBack").style.display = "none";
   document.title = "Mejor Cosecha — Asesor Técnico";
@@ -699,7 +699,7 @@ async function entrarCultivo(id){
   document.title = `${c.emoji} ${c.nombre} — Mejor Cosecha`;
 
   document.getElementById("homeScreen").style.display = "none";
-  document.getElementById("cropScreen").style.display = "";
+  document.getElementById("cropScreen").style.display = "block";
   document.getElementById("btnBack").style.display = "flex";
 
   // Reset tabs
@@ -997,42 +997,32 @@ function renderFertirriego(dias){
 // ============================================================
 function buildWAMessage(){
   const c = CULTIVOS.find(x=>x.id===cultivoActual);
-  let msg = `${c?c.emoji:"🌿"} *MEJOR COSECHA — ${c?c.nombre:"Cultivo"}*
-`;
-  msg += "━━━━━━━━━━━━━━━━━━━━━━━━
-";
-  if(selectedDias) msg += `📅 *Edad:* ${selectedDias} días
-🛢️ *Caneca:* ${canecaLT} litros
-`;
+  const SEP = "━━━━━━━━━━━━━━━━━━━━━━━━";
+  let msg = (c?c.emoji:"🌿") + " *MEJOR COSECHA — " + (c?c.nombre:"Cultivo") + "*\n";
+  msg += SEP + "\n";
+  if(selectedDias) msg += "📅 *Edad:* " + selectedDias + " días\n🛢️ *Caneca:* " + canecaLT + " litros\n";
 
   const enfsSelec = ((DB[cultivoActual]||{}).enfermedades||[]).filter(e=>selectedEnf.has(e.id)&&!e.ninguna);
-  if(enfsSelec.length){ msg+=`
-🦠 *Enfermedades detectadas:*
-`; enfsSelec.forEach(e=>msg+=`  ${e.icon||""} ${e.nombre} _(${e.cientifico||""})_
-`); }
+  if(enfsSelec.length){
+    msg += "\n🦠 *Enfermedades detectadas:*\n";
+    enfsSelec.forEach(e=>{ msg += "  " + (e.icon||"") + " " + e.nombre + " _(" + (e.cientifico||"") + ")_\n"; });
+  }
 
   if(selectedDias){
     const factor=canecaLT/200;
     const df=diasFoliar(); const c2=closest(df,selectedDias);
     const prods=((DB[cultivoActual]||{}).foliar||{})[c2]||[];
     if(prods.length){
-      msg+=`
-━━━━━━━━━━━━━━━━━━━━━━━━
-`;
-      msg+=`🌿 *APLICACIÓN FOLIAR — ${c2} días*
-
-`;
-      prods.forEach(p=>msg+=`  • ${p.nombre}: *${scaleDose(p.dosis,factor)}*
-`);
-      if(extraProductos.size){ msg+=`
-🦠 *Por enfermedad:*
-`; [...extraProductos.values()].forEach(ep=>msg+=`  • ${ep.nombre}: *Según indicación* _(${ep.enfNombre})_
-`); }
+      msg += "\n" + SEP + "\n";
+      msg += "🌿 *APLICACIÓN FOLIAR — " + c2 + " días*\n\n";
+      prods.forEach(p=>{ msg += "  • " + p.nombre + ": *" + scaleDose(p.dosis,factor) + "*\n"; });
+      if(extraProductos.size){
+        msg += "\n🦠 *Por enfermedad:*\n";
+        [...extraProductos.values()].forEach(ep=>{ msg += "  • " + ep.nombre + ": *Según indicación* _(" + ep.enfNombre + ")_\n"; });
+      }
     }
   }
-  msg += "
-━━━━━━━━━━━━━━━━━━━━━━━━
-📲 _Asesor Técnico · Mejor Cosecha_";
+  msg += "\n" + SEP + "\n📲 _Asesor Técnico · Mejor Cosecha_";
   return msg;
 }
 
